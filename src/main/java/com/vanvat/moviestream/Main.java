@@ -51,6 +51,7 @@ public class Main {
         WatchHistoryService watchHistoryService = new WatchHistoryService(historyRepository, movieService);
         RankingService rankingService = new RankingService();
         ReportService reportService = new ReportService(watchHistoryService, movieService);
+        ExportService exportService = new ExportService(movieService, categoryService);
 
         // Controllers
         MovieController movieController = new MovieController(movieService, rankingService);
@@ -58,11 +59,13 @@ public class Main {
         WatchlistController watchlistController = new WatchlistController(watchlistService);
         FavoriteController favoriteController = new FavoriteController(favoriteService);
         HistoryController historyController = new HistoryController(watchHistoryService, reportService);
+        ExportController exportController = new ExportController(exportService);
 
         // View
         try (Scanner scanner = new Scanner(System.in)) {
             ConsoleView view = new ConsoleView(movieController, categoryController,
-                    watchlistController, favoriteController, historyController, scanner);
+                    watchlistController, favoriteController, historyController,
+                    exportController, scanner);
             view.start();
         }
     }

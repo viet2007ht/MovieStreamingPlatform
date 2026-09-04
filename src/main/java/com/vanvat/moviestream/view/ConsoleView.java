@@ -37,6 +37,7 @@ public class ConsoleView {
     private final WatchlistController watchlistController;
     private final FavoriteController favoriteController;
     private final HistoryController historyController;
+    private final ExportController exportController;
     private final InputHelper input;
 
     public ConsoleView(MovieController movieController,
@@ -44,12 +45,14 @@ public class ConsoleView {
                         WatchlistController watchlistController,
                         FavoriteController favoriteController,
                         HistoryController historyController,
+                        ExportController exportController,
                         Scanner scanner) {
         this.movieController = movieController;
         this.categoryController = categoryController;
         this.watchlistController = watchlistController;
         this.favoriteController = favoriteController;
         this.historyController = historyController;
+        this.exportController = exportController;
         this.input = new InputHelper(scanner);
     }
 
@@ -62,6 +65,7 @@ public class ConsoleView {
             System.out.println("3. Watchlist");
             System.out.println("4. Favorites");
             System.out.println("5. Watching History & Reports");
+            System.out.println("6. Export Data to CSV");
             System.out.println("0. Exit");
             String choice = input.readLine("Choose: ");
             try {
@@ -71,6 +75,7 @@ public class ConsoleView {
                     case "3" -> watchlistMenu();
                     case "4" -> favoriteMenu();
                     case "5" -> historyMenu();
+                    case "6" -> exportMenu();
                     case "0" -> running = false;
                     default -> System.out.println("Invalid choice.");
                 }
@@ -136,6 +141,37 @@ public class ConsoleView {
         String id = input.readLine("Movie id to restore: ");
         movieController.restoreMovie(id);
         System.out.println("Restored.");
+    }
+
+    // ---------------------------------------------------------------- Export
+
+    private void exportMenu() {
+        System.out.println("\n-- Export Data to CSV --");
+        System.out.println("1. Export all movies to CSV");
+        System.out.println("2. Export watchlist to CSV");
+        System.out.println("3. Export watch history to CSV");
+        String choice = input.readLine("Choose: ");
+        switch (choice) {
+            case "1" -> {
+                String path = input.readLine("Output filepath (default: data/movies_export.csv): ");
+                if (path.isBlank()) path = "data/movies_export.csv";
+                exportController.exportMovies(movieController.listAll(), path);
+                System.out.println("Exported movies to " + path);
+            }
+            case "2" -> {
+                String path = input.readLine("Output filepath (default: data/watchlist_export.csv): ");
+                if (path.isBlank()) path = "data/watchlist_export.csv";
+                exportController.exportWatchlist(watchlistController.list(CURRENT_USER), path);
+                System.out.println("Exported watchlist to " + path);
+            }
+            case "3" -> {
+                String path = input.readLine("Output filepath (default: data/history_export.csv): ");
+                if (path.isBlank()) path = "data/history_export.csv";
+                exportController.exportHistory(historyController.list(CURRENT_USER), path);
+                System.out.println("Exported watch history to " + path);
+            }
+            default -> System.out.println("Invalid choice.");
+        }
     }
 
     private void addMovie() throws ValidationException {
