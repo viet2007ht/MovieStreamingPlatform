@@ -24,6 +24,14 @@ public class MovieFilter {
         return this;
     }
 
+    public MovieFilter withTitleContains(String titleSubstring) {
+        if (titleSubstring != null && !titleSubstring.isBlank()) {
+            String q = titleSubstring.toLowerCase(Locale.ROOT);
+            predicates.add(m -> m.getTitle().toLowerCase(Locale.ROOT).contains(q));
+        }
+        return this;
+    }
+
     public MovieFilter withMinRating(Double minRating) {
         if (minRating != null) {
             predicates.add(m -> m.getRating() >= minRating);
@@ -68,6 +76,13 @@ public class MovieFilter {
     public MovieFilter withMinDuration(Integer minMinutes) {
         if (minMinutes != null) {
             predicates.add(m -> m.getDurationMinutes() >= minMinutes);
+        }
+        return this;
+    }
+
+    public MovieFilter withMaxDuration(Integer maxMinutes) {
+        if (maxMinutes != null) {
+            predicates.add(m -> m.getDurationMinutes() <= maxMinutes);
         }
         return this;
     }
