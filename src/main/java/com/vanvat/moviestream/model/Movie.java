@@ -26,6 +26,8 @@ public class Movie {
     private int viewCount;
     private int favoriteCount;
 
+    private boolean deleted;
+
     public Movie() {
     }
 
@@ -43,6 +45,7 @@ public class Movie {
         this.description = description;
         this.viewCount = 0;
         this.favoriteCount = 0;
+        this.deleted = false;
     }
 
     // --- getters/setters ---
@@ -83,6 +86,9 @@ public class Movie {
     public void incrementFavoriteCount() { this.favoriteCount++; }
     public void decrementFavoriteCount() { if (this.favoriteCount > 0) this.favoriteCount--; }
 
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+
     /**
      * Popularity is a simple derived metric used for the "sort by
      * popularity" requirement, distinct from the weighted ranking score
@@ -93,7 +99,7 @@ public class Movie {
     }
 
     // --- file (de)serialization ---
-    // Format: id|title|director|actor1,actor2,...|categoryId|year|rating|duration|viewCount|favoriteCount|description
+    // Format: id|title|director|actor1,actor2,...|categoryId|year|rating|duration|viewCount|favoriteCount|description|deleted
 
     public String toFileLine() {
         return String.join("|",
@@ -107,7 +113,8 @@ public class Movie {
                 String.valueOf(durationMinutes),
                 String.valueOf(viewCount),
                 String.valueOf(favoriteCount),
-                escape(description == null ? "" : description));
+                escape(description == null ? "" : description),
+                String.valueOf(deleted));
     }
 
     public static Movie fromFileLine(String line) {
@@ -125,6 +132,7 @@ public class Movie {
         m.viewCount = Integer.parseInt(p[8]);
         m.favoriteCount = Integer.parseInt(p[9]);
         m.description = p.length > 10 ? unescape(p[10]) : "";
+        m.deleted = p.length > 11 && Boolean.parseBoolean(p[11]);
         return m;
     }
 
