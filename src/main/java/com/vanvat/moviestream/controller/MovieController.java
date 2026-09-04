@@ -37,6 +37,18 @@ public class MovieController {
         movieService.delete(id);
     }
 
+    public void softDeleteMovie(String id) throws NotFoundException {
+        movieService.softDelete(id);
+    }
+
+    public void restoreMovie(String id) throws NotFoundException {
+        movieService.restore(id);
+    }
+
+    public List<Movie> listDeleted() {
+        return movieService.getDeleted();
+    }
+
     public Movie viewMovieDetails(String id) throws NotFoundException {
         return movieService.getById(id);
     }

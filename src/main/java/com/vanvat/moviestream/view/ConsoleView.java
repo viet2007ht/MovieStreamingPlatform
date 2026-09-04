@@ -93,28 +93,49 @@ public class ConsoleView {
         System.out.println("\n-- Movies --");
         System.out.println("1. Add movie");
         System.out.println("2. Edit movie");
-        System.out.println("3. Delete movie");
-        System.out.println("4. View movie details");
-        System.out.println("5. List all movies");
-        System.out.println("6. Search movies");
-        System.out.println("7. Sort movies");
-        System.out.println("8. Browse by category");
-        System.out.println("9. Advanced filter");
-        System.out.println("10. Generate ranking");
+        System.out.println("3. Delete movie (soft)");
+        System.out.println("4. Restore deleted movie");
+        System.out.println("5. View movie details");
+        System.out.println("6. List all movies");
+        System.out.println("7. Search movies");
+        System.out.println("8. Sort movies");
+        System.out.println("9. Browse by category");
+        System.out.println("10. Advanced filter");
+        System.out.println("11. Generate ranking");
         String choice = input.readLine("Choose: ");
         switch (choice) {
             case "1" -> addMovie();
             case "2" -> editMovie();
-            case "3" -> deleteMovie();
-            case "4" -> viewMovieDetails();
-            case "5" -> printMovies(movieController.listAll());
-            case "6" -> searchMovies();
-            case "7" -> sortMovies();
-            case "8" -> browseByCategory();
-            case "9" -> advancedFilter();
-            case "10" -> printMovies(movieController.generateRanking());
+            case "3" -> softDeleteMovie();
+            case "4" -> restoreMovie();
+            case "5" -> viewMovieDetails();
+            case "6" -> printMovies(movieController.listAll());
+            case "7" -> searchMovies();
+            case "8" -> sortMovies();
+            case "9" -> browseByCategory();
+            case "10" -> advancedFilter();
+            case "11" -> printMovies(movieController.generateRanking());
             default -> System.out.println("Invalid choice.");
         }
+    }
+
+    private void softDeleteMovie() throws NotFoundException {
+        String id = input.readLine("Movie id to soft-delete: ");
+        movieController.softDeleteMovie(id);
+        System.out.println("Soft deleted.");
+    }
+
+    private void restoreMovie() throws NotFoundException {
+        System.out.println("\n-- Deleted Movies --");
+        List<Movie> deleted = movieController.listDeleted();
+        if (deleted.isEmpty()) {
+            System.out.println("No deleted movies.");
+            return;
+        }
+        printMovies(deleted);
+        String id = input.readLine("Movie id to restore: ");
+        movieController.restoreMovie(id);
+        System.out.println("Restored.");
     }
 
     private void addMovie() throws ValidationException {
