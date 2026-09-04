@@ -24,7 +24,7 @@ public class CategoryController {
         return categoryService.update(id, name, description);
     }
 
-    public void deleteCategory(String id) throws NotFoundException {
+    public void deleteCategory(String id) throws ValidationException, NotFoundException {
         categoryService.delete(id);
     }
 

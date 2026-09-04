@@ -1,5 +1,6 @@
 package com.vanvat.moviestream.controller;
 
+import com.vanvat.moviestream.exception.NotFoundException;
 import com.vanvat.moviestream.model.UserMovieLink;
 import com.vanvat.moviestream.service.WatchlistService;
 
@@ -13,7 +14,7 @@ public class WatchlistController {
         this.watchlistService = watchlistService;
     }
 
-    public void add(String userId, String movieId) {
+    public void add(String userId, String movieId) throws NotFoundException {
         watchlistService.add(userId, movieId);
     }
 

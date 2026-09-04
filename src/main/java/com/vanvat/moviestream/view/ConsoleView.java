@@ -247,7 +247,7 @@ public class ConsoleView {
 
     // -------------------------------------------------------------- Watchlist
 
-    private void watchlistMenu() {
+    private void watchlistMenu() throws NotFoundException {
         System.out.println("\n-- Watchlist --");
         System.out.println("1. Add movie");
         System.out.println("2. Remove movie");
