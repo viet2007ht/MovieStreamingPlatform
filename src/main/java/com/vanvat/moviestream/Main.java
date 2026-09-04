@@ -39,9 +39,14 @@ public class Main {
         WatchHistoryRepository historyRepository = new WatchHistoryRepository(DATA_DIR + "history.txt");
 
         // Services (business logic)
-        MovieService movieService = new MovieService(movieRepository);
+        // CategoryService is constructed first since MovieService needs it (to validate
+        // a movie's categoryId against real categories); CategoryService in turn needs
+        // MovieService later (to check for referencing movies before a delete), so that
+        // back-reference is wired via setMovieService() once both objects exist.
         CategoryService categoryService = new CategoryService(categoryRepository);
-        WatchlistService watchlistService = new WatchlistService(watchlistRepository);
+        MovieService movieService = new MovieService(movieRepository, categoryService);
+        categoryService.setMovieService(movieService);
+        WatchlistService watchlistService = new WatchlistService(watchlistRepository, movieService);
         FavoriteService favoriteService = new FavoriteService(favoriteRepository, movieService);
         WatchHistoryService watchHistoryService = new WatchHistoryService(historyRepository, movieService);
         RankingService rankingService = new RankingService();
