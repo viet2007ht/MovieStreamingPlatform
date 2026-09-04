@@ -223,18 +223,24 @@ public class ConsoleView {
     }
 
     private void advancedFilter() {
+        String titleSub = input.readLine("Title contains (blank = any): ");
         String categoryId = input.readLine("Category id (blank = any): ");
         String minRatingStr = input.readLine("Min rating (blank = any): ");
+        String maxRatingStr = input.readLine("Max rating (blank = any): ");
         String yearFromStr = input.readLine("From year (blank = any): ");
         String yearToStr = input.readLine("To year (blank = any): ");
+        String maxDurStr = input.readLine("Max duration minutes (blank = any): ");
         String actor = input.readLine("Actor contains (blank = any): ");
 
         MovieFilter filter = new MovieFilter()
+                .withTitleContains(titleSub.isBlank() ? null : titleSub)
                 .withCategory(categoryId.isBlank() ? null : categoryId)
                 .withMinRating(minRatingStr.isBlank() ? null : Double.parseDouble(minRatingStr))
+                .withMaxRating(maxRatingStr.isBlank() ? null : Double.parseDouble(maxRatingStr))
                 .withYearRange(
                         yearFromStr.isBlank() ? null : Integer.parseInt(yearFromStr),
                         yearToStr.isBlank() ? null : Integer.parseInt(yearToStr))
+                .withMaxDuration(maxDurStr.isBlank() ? null : Integer.parseInt(maxDurStr))
                 .withActor(actor.isBlank() ? null : actor);
 
         printMovies(movieController.filter(filter));
