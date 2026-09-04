@@ -239,8 +239,9 @@ public class ConsoleView {
         System.out.println("\n-- Categories --");
         System.out.println("1. Add category");
         System.out.println("2. Edit category");
-        System.out.println("3. Delete category");
-        System.out.println("4. List categories");
+        System.out.println("3. Delete category (soft)");
+        System.out.println("4. Restore deleted category");
+        System.out.println("5. List categories");
         String choice = input.readLine("Choose: ");
         switch (choice) {
             case "1" -> {
@@ -257,11 +258,23 @@ public class ConsoleView {
                 System.out.println("Updated.");
             }
             case "3" -> {
-                String id = input.readLine("Category id: ");
-                categoryController.deleteCategory(id);
-                System.out.println("Deleted.");
+                String id = input.readLine("Category id to soft-delete: ");
+                categoryController.softDeleteCategory(id);
+                System.out.println("Soft-deleted.");
             }
-            case "4" -> categoryController.listAll().forEach(System.out::println);
+            case "4" -> {
+                List<Category> deleted = categoryController.listDeleted();
+                if (deleted.isEmpty()) {
+                    System.out.println("No deleted categories.");
+                } else {
+                    System.out.println("\n-- Deleted Categories --");
+                    deleted.forEach(c -> System.out.println("  " + c));
+                    String id = input.readLine("Category id to restore: ");
+                    categoryController.restoreCategory(id);
+                    System.out.println("Restored.");
+                }
+            }
+            case "5" -> categoryController.listAll().forEach(c -> System.out.println("  " + c));
             default -> System.out.println("Invalid choice.");
         }
     }

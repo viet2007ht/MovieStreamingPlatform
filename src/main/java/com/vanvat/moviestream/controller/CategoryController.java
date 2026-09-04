@@ -28,6 +28,18 @@ public class CategoryController {
         categoryService.delete(id);
     }
 
+    public void softDeleteCategory(String id) throws ValidationException, NotFoundException {
+        categoryService.softDelete(id);
+    }
+
+    public void restoreCategory(String id) throws NotFoundException {
+        categoryService.restore(id);
+    }
+
+    public List<Category> listDeleted() {
+        return categoryService.getDeleted();
+    }
+
     public List<Category> listAll() {
         return categoryService.getAll();
     }
