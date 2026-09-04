@@ -71,6 +71,38 @@ public class CategoryService {
         repository.deleteById(id);
     }
 
+    public void softDelete(String id) throws NotFoundException, ValidationException {
+        getById(id); // throws if missing
+        if (movieService != null) {
+            long referencing = movieService.getAll().stream()
+                    .filter(m -> m.getCategoryId().equals(id))
+                    .count();
+            if (referencing > 0) {
+                throw new ValidationException(
+                        "Cannot soft-delete category " + id + ": " + referencing
+                                + " movie(s) still reference it. Reassign or delete them first.");
+            }
+        }
+        Category category = getById(id);
+        category.setDeleted(true);
+        repository.save(category);
+    }
+
+    public void restore(String id) throws NotFoundException {
+        Category category = repository.findAllIncludingDeleted().stream()
+                .filter(c -> c.getId().equals(id) && c.isDeleted())
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Deleted category not found: " + id));
+        category.setDeleted(false);
+        repository.save(category);
+    }
+
+    public List<Category> getDeleted() {
+        return repository.findAllIncludingDeleted().stream()
+                .filter(Category::isDeleted)
+                .toList();
+    }
+
     /** Category names must be unique (case-insensitive), matching how users pick them by name. */
     private void requireUniqueName(String name, String excludingId) throws ValidationException {
         boolean duplicate = repository.findAll().stream()
