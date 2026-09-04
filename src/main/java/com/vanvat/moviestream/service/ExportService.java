@@ -47,6 +47,41 @@ public class ExportService {
         return sb.toString();
     }
 
+    public String exportWatchlistCsv(List<UserMovieLink> links) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(CsvExporter.buildRow("User ID", "Movie ID", "Movie Title")).append("\n");
+        for (UserMovieLink link : links) {
+            String title = "";
+            try {
+                title = movieService.getById(link.getMovieId()).getTitle();
+            } catch (NotFoundException ignored) {
+            }
+            sb.append(CsvExporter.buildRow(link.getUserId(), link.getMovieId(), title)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public String exportHistoryCsv(List<WatchHistoryEntry> history) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(CsvExporter.buildRow("User ID", "Movie ID", "Movie Title", "Watched At", "Position (sec)", "Total Duration (sec)")).append("\n");
+        for (WatchHistoryEntry entry : history) {
+            String title = "";
+            try {
+                title = movieService.getById(entry.getMovieId()).getTitle();
+            } catch (NotFoundException ignored) {
+            }
+            sb.append(CsvExporter.buildRow(
+                    entry.getUserId(),
+                    entry.getMovieId(),
+                    title,
+                    entry.getWatchedAt().toString(),
+                    entry.getPositionSeconds(),
+                    entry.getTotalSeconds()
+            )).append("\n");
+        }
+        return sb.toString();
+    }
+
     public void saveToFile(String content, String filePath) {
         FileUtils.writeLines(filePath, List.of(content.split("\n")));
     }
