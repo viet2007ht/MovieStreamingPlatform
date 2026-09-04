@@ -16,10 +16,12 @@ public class MovieService {
     public enum SortField { TITLE, RATING, RELEASE_YEAR, POPULARITY }
 
     private final MovieRepository repository;
+    private final CategoryService categoryService;
     private final IdGenerator idGenerator;
 
-    public MovieService(MovieRepository repository) {
+    public MovieService(MovieRepository repository, CategoryService categoryService) {
         this.repository = repository;
+        this.categoryService = categoryService;
         int maxId = repository.findAll().stream()
                 .map(m -> m.getId().replace("MV-", ""))
                 .mapToInt(s -> s.matches("\\d+") ? Integer.parseInt(s) : 0)
@@ -105,9 +107,23 @@ public class MovieService {
         Validator.requireNonBlank(m.getTitle(), "Title");
         Validator.requireNonBlank(m.getDirector(), "Director");
         Validator.requireNonBlank(m.getCategoryId(), "Category");
+        requireExistingCategory(m.getCategoryId());
         Validator.requireValidYear(m.getReleaseYear());
         Validator.requireRange(m.getRating(), 0.0, 10.0, "Rating");
         Validator.requirePositive(m.getDurationMinutes(), "Duration");
+    }
+
+    /**
+     * Foreign-key check: a movie must reference a category that actually
+     * exists, or browsing/deleting by category later silently loses movies
+     * (or a category delete can leave dangling references).
+     */
+    private void requireExistingCategory(String categoryId) throws ValidationException {
+        try {
+            categoryService.getById(categoryId);
+        } catch (NotFoundException e) {
+            throw new ValidationException("Category does not exist: " + categoryId);
+        }
     }
 
     MovieRepository getRepository() {
