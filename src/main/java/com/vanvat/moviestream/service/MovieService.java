@@ -111,6 +111,10 @@ public class MovieService {
                 .toList();
     }
 
+    public List<Movie> filter(MovieFilter filter) {
+        return filter.apply(getAll());
+    }
+
     public List<Movie> sort(List<Movie> movies, SortField field, boolean ascending) {
         Comparator<Movie> comparator = switch (field) {
             case TITLE -> Comparator.comparing(Movie::getTitle, String.CASE_INSENSITIVE_ORDER);
