@@ -10,6 +10,7 @@ public class Category {
     private String id;
     private String name;
     private String description;
+    private boolean deleted;
 
     public Category() {
     }
@@ -18,6 +19,7 @@ public class Category {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.deleted = false;
     }
 
     public String getId() {
@@ -44,6 +46,14 @@ public class Category {
         this.description = description;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     /**
      * Serializes to a single pipe-delimited line for file storage.
      * Any literal '|' or newline in field values is escaped so the
@@ -53,7 +63,8 @@ public class Category {
         return String.join("|",
                 id,
                 escape(name),
-                escape(description == null ? "" : description));
+                escape(description == null ? "" : description),
+                String.valueOf(deleted));
     }
 
     public static Category fromFileLine(String line) {
@@ -62,6 +73,7 @@ public class Category {
         c.id = parts[0];
         c.name = unescape(parts[1]);
         c.description = parts.length > 2 ? unescape(parts[2]) : "";
+        c.deleted = parts.length > 3 && Boolean.parseBoolean(parts[3]);
         return c;
     }
 
