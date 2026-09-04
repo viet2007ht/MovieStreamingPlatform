@@ -58,6 +58,27 @@ public class MovieService {
         repository.deleteById(id);
     }
 
+    public void softDelete(String id) throws NotFoundException {
+        Movie movie = getById(id);
+        movie.setDeleted(true);
+        repository.save(movie);
+    }
+
+    public void restore(String id) throws NotFoundException {
+        Movie movie = repository.findAllIncludingDeleted().stream()
+                .filter(m -> m.getId().equals(id) && m.isDeleted())
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Deleted movie not found: " + id));
+        movie.setDeleted(false);
+        repository.save(movie);
+    }
+
+    public List<Movie> getDeleted() {
+        return repository.findAllIncludingDeleted().stream()
+                .filter(Movie::isDeleted)
+                .toList();
+    }
+
     public Movie getById(String id) throws NotFoundException {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Movie not found: " + id));
