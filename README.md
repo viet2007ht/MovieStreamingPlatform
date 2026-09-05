@@ -227,21 +227,3 @@ Movies support soft-delete/restore rather than hard deletion, so category/watchl
 
 ### RFC 4180 CSV export
 `util/CsvExporter` implements comma/quote/newline escaping by hand (no library), quoting fields that need it and doubling embedded quotes.
-
----
-
-## ⚠️ Known Simplifications
-
-*(flag these in your report — don't hide them)*
-
-- **Single hardcoded user** (`CURRENT_USER = "U-1"` in `ConsoleView`). Every service already takes a `userId` parameter, so adding a login/User CRUD screen is additive, not a redesign.
-- **Load-all-then-rewrite** persistence (`AbstractFileRepository`) — fine for course-project data volumes; a production system would append/index instead of rewriting the whole file on every write.
-- No automated tests yet.
-
----
-
-## 🔜 Suggested Next Steps
-
-1. Add a `User` model + `UserRepository` + a login prompt in `ConsoleView` (replaces the hardcoded `CURRENT_USER`).
-2. Unit tests for `RankingService`, `MovieFilter`, and `CommandManager` (pure logic, no file I/O — easiest to test in isolation).
-3. Optionally split `ConsoleView`'s menus into smaller per-feature view classes if it keeps growing.
