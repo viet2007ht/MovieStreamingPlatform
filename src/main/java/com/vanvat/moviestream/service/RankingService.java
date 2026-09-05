@@ -1,6 +1,7 @@
 package com.vanvat.moviestream.service;
 
 import com.vanvat.moviestream.model.Movie;
+import com.vanvat.moviestream.algorithms.MovieSorter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -33,7 +34,8 @@ public class RankingService {
                 .comparingDouble((Movie m) -> score(m, maxRating, maxViews, maxFavorites))
                 .reversed();
 
-        return movies.stream().sorted(byScoreDesc).toList();
+        // Manual merge sort — O(n log n), stable, consistent with MovieService.sort().
+        return MovieSorter.mergeSort(movies, byScoreDesc);
     }
 
     public double score(Movie m, double maxRating, int maxViews, int maxFavorites) {
