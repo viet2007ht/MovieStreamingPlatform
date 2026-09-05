@@ -1,6 +1,7 @@
 package com.vanvat.moviestream.view;
 
 import com.vanvat.moviestream.controller.CategoryController;
+import com.vanvat.moviestream.controller.ExportController;
 import com.vanvat.moviestream.controller.FavoriteController;
 import com.vanvat.moviestream.controller.HistoryController;
 import com.vanvat.moviestream.controller.MovieController;
@@ -167,7 +168,7 @@ public class ConsoleView {
             case "3" -> {
                 String path = input.readLine("Output filepath (default: data/history_export.csv): ");
                 if (path.isBlank()) path = "data/history_export.csv";
-                exportController.exportHistory(historyController.list(CURRENT_USER), path);
+                exportController.exportHistory(historyController.getHistory(CURRENT_USER), path);
                 System.out.println("Exported watch history to " + path);
             }
             default -> System.out.println("Invalid choice.");

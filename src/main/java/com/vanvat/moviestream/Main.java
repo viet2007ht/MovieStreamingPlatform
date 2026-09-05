@@ -1,6 +1,7 @@
 package com.vanvat.moviestream;
 
 import com.vanvat.moviestream.controller.CategoryController;
+import com.vanvat.moviestream.controller.ExportController;
 import com.vanvat.moviestream.controller.FavoriteController;
 import com.vanvat.moviestream.controller.HistoryController;
 import com.vanvat.moviestream.controller.MovieController;
@@ -10,6 +11,7 @@ import com.vanvat.moviestream.repository.MovieRepository;
 import com.vanvat.moviestream.repository.UserMovieLinkRepository;
 import com.vanvat.moviestream.repository.WatchHistoryRepository;
 import com.vanvat.moviestream.service.CategoryService;
+import com.vanvat.moviestream.service.ExportService;
 import com.vanvat.moviestream.service.FavoriteService;
 import com.vanvat.moviestream.service.MovieService;
 import com.vanvat.moviestream.service.RankingService;
