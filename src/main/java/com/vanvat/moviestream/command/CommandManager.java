@@ -1,7 +1,6 @@
 package com.vanvat.moviestream.command;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import com.vanvat.moviestream.structures.CustomStack;
 
 /**
  * Classic two-stack Undo/Redo manager. Running a new command clears the
@@ -10,8 +9,8 @@ import java.util.Deque;
  */
 public class CommandManager {
 
-    private final Deque<Command> undoStack = new ArrayDeque<>();
-    private final Deque<Command> redoStack = new ArrayDeque<>();
+    private final CustomStack<Command> undoStack = new CustomStack<>();
+    private final CustomStack<Command> redoStack = new CustomStack<>();
 
     public void run(Command command) {
         command.execute();
