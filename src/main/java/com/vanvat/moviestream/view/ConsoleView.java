@@ -266,7 +266,29 @@ public class ConsoleView {
             System.out.println("(no movies)");
             return;
         }
-        movies.forEach(m -> System.out.println(describeMovie(m)));
+        int pageSize = 5;
+        int currentPage = 1;
+        boolean navigating = true;
+        while (navigating) {
+            com.vanvat.moviestream.util.Paginator.Page<Movie> page =
+                    com.vanvat.moviestream.util.Paginator.paginate(movies, currentPage, pageSize);
+            System.out.printf("%n-- Movies (Page %d of %d, Total: %d) --%n",
+                    page.pageNumber(), Math.max(1, page.totalPages()), page.totalItems());
+            page.items().forEach(m -> System.out.println(describeMovie(m)));
+
+            if (page.totalPages() <= 1) {
+                break;
+            }
+
+            System.out.println("[N]ext page | [P]rev page | [Q]uit list");
+            String cmd = input.readLine("Option: ").trim().toLowerCase();
+            switch (cmd) {
+                case "n" -> currentPage = Math.min(page.totalPages(), currentPage + 1);
+                case "p" -> currentPage = Math.max(1, currentPage - 1);
+                case "q" -> navigating = false;
+                default -> navigating = false;
+            }
+        }
     }
 
     private String describeMovie(Movie m) {
