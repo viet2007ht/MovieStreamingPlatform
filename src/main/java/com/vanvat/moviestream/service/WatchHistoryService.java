@@ -4,12 +4,15 @@ import com.vanvat.moviestream.exception.NotFoundException;
 import com.vanvat.moviestream.model.Movie;
 import com.vanvat.moviestream.model.WatchHistoryEntry;
 import com.vanvat.moviestream.repository.WatchHistoryRepository;
+import com.vanvat.moviestream.structures.CustomLinkedList;
 import com.vanvat.moviestream.util.IdGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WatchHistoryService {
@@ -51,17 +54,35 @@ public class WatchHistoryService {
                 .toList();
     }
 
-    /** Most recent entry per movie, most recent movie first. */
+    /**
+     * Most recent entry per movie, most recent movie first, capped at {@code limit}.
+     *
+     * <p>Uses a {@link CustomLinkedList} as the accumulator: entries are appended
+     * at the tail in "most-recent first" order after deduplication, giving an
+     * O(n) traversal of the history with O(1) appends — a natural fit for
+     * building an ordered window of recent items without random access.
+     */
     public List<WatchHistoryEntry> getRecentlyWatched(String userId, int limit) {
-        Map<String, WatchHistoryEntry> latestPerMovie = repository.findByUserId(userId).stream()
-                .collect(Collectors.toMap(
-                        WatchHistoryEntry::getMovieId,
-                        e -> e,
-                        (a, b) -> a.getWatchedAt().isAfter(b.getWatchedAt()) ? a : b));
-        return latestPerMovie.values().stream()
+        // Sort raw entries most-recent first (time-ordered, not movie-field-ordered,
+        // so MovieSorter is not applicable here).
+        List<WatchHistoryEntry> sorted = repository.findByUserId(userId).stream()
                 .sorted(Comparator.comparing(WatchHistoryEntry::getWatchedAt).reversed())
-                .limit(limit)
                 .toList();
+
+        // Walk the sorted list, keeping only the first (= most recent) entry per
+        // movie. Use a hand-rolled linked list to accumulate results.
+        Set<String> seen = new HashSet<>();
+        CustomLinkedList<WatchHistoryEntry> recentList = new CustomLinkedList<>();
+        for (WatchHistoryEntry entry : sorted) {
+            if (!seen.contains(entry.getMovieId())) {
+                seen.add(entry.getMovieId());
+                recentList.addLast(entry);
+                if (recentList.size() == limit) {
+                    break;  // early exit once the window is full
+                }
+            }
+        }
+        return recentList.toList();
     }
 
     /** Movies the user started but hasn't finished, most recently touched first. */
