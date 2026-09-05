@@ -4,6 +4,8 @@ import com.vanvat.moviestream.exception.NotFoundException;
 import com.vanvat.moviestream.exception.ValidationException;
 import com.vanvat.moviestream.model.Movie;
 import com.vanvat.moviestream.repository.MovieRepository;
+import com.vanvat.moviestream.algorithms.MovieSearcher;
+import com.vanvat.moviestream.algorithms.MovieSorter;
 import com.vanvat.moviestream.util.IdGenerator;
 import com.vanvat.moviestream.util.Validator;
 
@@ -88,21 +90,9 @@ public class MovieService {
         return repository.findAll();
     }
 
-    /** Single-field search, case-insensitive substring match. */
+    /** Single-field search, case-insensitive substring match (manual linear scan). */
     public List<Movie> search(String field, String query) {
-        String q = query.trim().toLowerCase(Locale.ROOT);
-        return switch (field.toLowerCase(Locale.ROOT)) {
-            case "title" -> repository.findAll().stream()
-                    .filter(m -> m.getTitle().toLowerCase(Locale.ROOT).contains(q)).toList();
-            case "actor" -> repository.findAll().stream()
-                    .filter(m -> m.getActors().stream()
-                            .anyMatch(a -> a.toLowerCase(Locale.ROOT).contains(q))).toList();
-            case "director" -> repository.findAll().stream()
-                    .filter(m -> m.getDirector().toLowerCase(Locale.ROOT).contains(q)).toList();
-            case "genre", "category" -> repository.findAll().stream()
-                    .filter(m -> m.getCategoryId().toLowerCase(Locale.ROOT).contains(q)).toList();
-            default -> throw new IllegalArgumentException("Unknown search field: " + field);
-        };
+        return MovieSearcher.linearSearch(repository.findAll(), field, query);
     }
 
     public List<Movie> browseByCategory(String categoryId) {
@@ -117,15 +107,16 @@ public class MovieService {
 
     public List<Movie> sort(List<Movie> movies, SortField field, boolean ascending) {
         Comparator<Movie> comparator = switch (field) {
-            case TITLE -> Comparator.comparing(Movie::getTitle, String.CASE_INSENSITIVE_ORDER);
-            case RATING -> Comparator.comparingDouble(Movie::getRating);
+            case TITLE        -> Comparator.comparing(Movie::getTitle, String.CASE_INSENSITIVE_ORDER);
+            case RATING       -> Comparator.comparingDouble(Movie::getRating);
             case RELEASE_YEAR -> Comparator.comparingInt(Movie::getReleaseYear);
-            case POPULARITY -> Comparator.comparingInt(Movie::getPopularity);
+            case POPULARITY   -> Comparator.comparingInt(Movie::getPopularity);
         };
         if (!ascending) {
             comparator = comparator.reversed();
         }
-        return movies.stream().sorted(comparator).toList();
+        // Manual merge sort — satisfies the "manually implemented algorithms" requirement.
+        return MovieSorter.mergeSort(movies, comparator);
     }
 
     private void validate(Movie m) throws ValidationException {
