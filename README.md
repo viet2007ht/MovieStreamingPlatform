@@ -227,3 +227,6 @@ Movies support soft-delete/restore rather than hard deletion, so category/watchl
 
 ### RFC 4180 CSV export
 `util/CsvExporter` implements comma/quote/newline escaping by hand (no library), quoting fields that need it and doubling embedded quotes.
+
+
+Easter egg: Tung Tung Tung Sahur!
